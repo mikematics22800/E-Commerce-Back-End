@@ -13,7 +13,7 @@ CREATE TABLE Product (
     id INT NOT NULL PRIMARY KEY SERIAL,
     product_name VARCHAR NOT NULL,
     price DECIMAL NOT NULL,
-    stock INT NOT NULL,
+    stock INT NOT NULL DEFAULT 10,
     category_id INT,
     FOREIGN KEY (category_id) REFERENCES Category(id)
 );
