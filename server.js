@@ -1,16 +1,27 @@
 const express = require('express');
 const routes = require('./routes');
-// import sequelize connection
+const { Sequelize } = require('sequelize');
+require('dotenv').config(); // Load environment variables from .env file
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// Create a new Sequelize instance to connect to the e-commerce database
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: 'localhost', // Database host
+  dialect: 'postgres', // Database dialect
+});
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const app = express(); // Initialize express app
+const PORT = process.env.PORT || 3001; // Set the port to the environment variable or default to 3001
 
-app.use(routes);
+app.use(express.json()); // Middleware to parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
 
-// sync sequelize models to the database, then turn on the server
+app.use(routes); // Use the routes defined in routes folder
+
+// Test the database connection and then start the server
+sequelize.authenticate()
+  .then(() => console.log('Database connection has been established successfully.'))
+  .catch((err) => console.error('Unable to connect to the database:', err));
+
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}!`);
+  console.log(`App listening on port ${PORT}.`); // Start the server and listen on the specified port
 });
