@@ -4,12 +4,12 @@ DROP DATABASE IF EXISTS e_commerce_db;
 -- CREATE DATABASE
 CREATE DATABASE e_commerce_db;
 
-CREATE TABLE Category (
+CREATE TABLE category (
     id INT NOT NULL PRIMARY KEY SERIAL,
     category_name VARCHAR NOT NULL
 );
 
-CREATE TABLE Product (
+CREATE TABLE product (
     id INT NOT NULL PRIMARY KEY SERIAL,
     product_name VARCHAR NOT NULL,
     price DECIMAL NOT NULL,
@@ -18,12 +18,12 @@ CREATE TABLE Product (
     FOREIGN KEY (category_id) REFERENCES Category(id)
 );
 
-CREATE TABLE Tag (
+CREATE TABLE tag (
     id INT NOT NULL PRIMARY KEY SERIAL,
     tag_name VARCHAR NOT NULL
 );
 
-CREATE TABLE ProductTag (
+CREATE TABLE product_tag (
     id INT NOT NULL PRIMARY KEY SERIAL,
     product_id INT,
     tag_id INT,
