@@ -3,8 +3,6 @@ const routes = require('./routes');
 const sequelize = require('./config/connection');
 require('dotenv').config(); // Load environment variables from .env file
 
-// Create a new Sequelize instance to connect to the e-commerce database
-
 const app = express(); // Initialize express app
 const PORT = process.env.PORT || 3001; // Set the port to the environment variable or default to 3001
 
@@ -21,5 +19,3 @@ sequelize.authenticate()
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}.`); // Start the server and listen on the specified port
 });
-
-module.exports = sequelize; // Export the sequelize connection for use in other files
