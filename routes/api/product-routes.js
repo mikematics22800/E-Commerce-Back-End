@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
     res.json(products)
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -23,7 +23,7 @@ router.get('/:id', (req, res) => {
     res.json(product)
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -111,11 +111,11 @@ router.delete('/:id', (req, res) => {
       res.send(`Product "${product.product_name}" deleted`);
     }).catch((err) => {
       console.log(err);
-      res.json(err);
+      res.status(500).json({ error: err.message });
     });
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 

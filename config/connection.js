@@ -11,5 +11,5 @@ const sequelize = process.env.DB_URL
         decimalNumbers: true,
       },
     });
-
+    
 module.exports = sequelize;

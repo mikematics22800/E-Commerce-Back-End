@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
     res.json(categories)
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -21,7 +21,7 @@ router.get('/:id', (req, res) => {
     res.json(tag)
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
     res.send(`New tag "${tag.tag_name}" created`);
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -42,11 +42,11 @@ router.put('/:id', (req, res) => {
       res.send(`Tag "${tag.tag_name}" changed to "${req.body.tag_name}"`);
     }).catch((err) => {
       console.log(err);
-      res.json(err);
+      res.status(500).json({ error: err.message });
     });
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 
@@ -58,11 +58,11 @@ router.delete('/:id', (req, res) => {
       res.send(`Tag "${tag.tag_name}" deleted`);
     }).catch((err) => {
       console.log(err);
-      res.json(err);
+      res.status(500).json({ error: err.message });
     });
   }).catch((err) => {
     console.log(err);
-    res.json(err);
+    res.status(500).json({ error: err.message });
   });
 });
 

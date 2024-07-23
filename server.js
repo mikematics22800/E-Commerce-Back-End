@@ -11,11 +11,14 @@ app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-enco
 
 app.use(routes); // Use the routes defined in routes folder
 
-// Test the database connection and then start the server
-sequelize.authenticate()
-  .then(() => console.log('Database connection has been established successfully.'))
-  .catch((err) => console.error('Unable to connect to the database:', err));
-
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}.`); // Start the server and listen on the specified port
+// Test the database connection, sync models, and then start the server
+sequelize.authenticate().then(() => {
+  console.log('Database connection has been established successfully.');
+  return sequelize.sync({ force: false }); // Sync models
+}).then(() => {
+  app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}.`); // Start the server and listen on the specified port
+  });
+}).catch((err) => {
+  console.error('Unable to connect to the database or sync models:', err); // Log an error if unable to connect to the database or sync models
 });
