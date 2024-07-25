@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
   Category.findAll().then((categories) => {
-    res.json(categories)
+    res.status(200).json(categories)
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -18,7 +18,7 @@ router.get('/:id', (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
   Category.findByPk(req.params.id).then((category) => {
-    res.json(category);
+    res.status(200).json(category);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -28,7 +28,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   // create a new category
   Category.create({category_name: req.body.category_name}).then((category) => {
-    res.send(`New category "${category.category_name}" created`);
+    res.status(200).json(category);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -36,14 +36,9 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-  // First, find the category to get its original name
-  Category.findByPk(req.params.id).then((category) => {
-    Category.update({category_name: req.body.category_name}, {where: {id: req.params.id}}).then(() => {
-      res.send(`Category "${category.category_name}" changed to "${req.body.category_name}"`);
-    }).catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err.message });
-    });
+  // update a category by its `id` value
+  Category.update({category_name: req.body.category_name}, {where: {id: req.params.id}}).then((rows_affected) => {
+    res.status(200).json(rows_affected[0])
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -51,14 +46,9 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  // First, find the category to get its name before deletion
-  Category.findByPk(req.params.id).then((category) => {
-    Category.destroy({where: {id: req.params.id}}).then(() => {
-      res.send(`Category "${category.category_name}" deleted`);
-    }).catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err.message });
-    });
+  // delete a category by its `id` value
+  Category.destroy({where: {id: req.params.id}}).then((rows_affected) => {
+    res.status(200).json(rows_affected);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });

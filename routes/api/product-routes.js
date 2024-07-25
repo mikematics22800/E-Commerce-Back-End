@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Product and Tag data
   Product.findAll().then((products) => {
-    res.json(products)
+    res.status(200).json(products)
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -20,7 +20,7 @@ router.get('/:id', (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Product and Tag data
   Product.findByPk(req.params.id).then((product) => {
-    res.json(product)
+    res.status(200).json(product)
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -105,18 +105,12 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  // First, find the Product to get its name before deletion
-  Product.findByPk(req.params.id).then((product) => {
-    Product.destroy({where: {id: req.params.id}}).then(() => {
-      res.send(`Product "${product.product_name}" deleted`);
-    }).catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: err.message });
-    });
+  Product.destroy({where: {id: req.params.id}}).then((rows_affected) => {
+    res.status(200).json(rows_affected);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
   });
-});
+})
 
 module.exports = router;
