@@ -14,7 +14,6 @@ app.use(routes); // Use the routes defined in routes folder
 // Test the database connection, sync models, and then start the server
 sequelize.authenticate().then(() => {
   console.log('Database connection has been established successfully.');
-  return sequelize.sync({ force: false }); // Sync models
 }).then(() => {
   app.listen(PORT, () => {
     console.log(`App listening on port http://localhost:${PORT}.`); // Start the server and listen on the specified port
