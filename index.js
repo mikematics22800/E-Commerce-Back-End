@@ -17,8 +17,8 @@ sequelize.authenticate().then(() => {
   return sequelize.sync({ force: false }); // Sync models
 }).then(() => {
   app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}.`); // Start the server and listen on the specified port
+    console.log(`App listening on port http://localhost:${PORT}.`); // Start the server and listen on the specified port
   });
 }).catch((err) => {
-  console.error('Unable to connect to the database or sync models:', err); // Log an error if unable to connect to the database or sync models
+  console.error('Unable to connect to the database or sync models:', err); 
 });
