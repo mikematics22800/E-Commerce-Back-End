@@ -1,44 +1,49 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 
-router.get('/', (req, res) => {
-  Category.findAll().then((categories) => {
-    const categoriesWithProducts = categories.map((category) => { 
+router.get('/', async (req, res) => {
+  try {
+    const categories = await Category.findAll();
+    const categoriesWithProducts = await Promise.all(categories.map(async (category) => {
       // get all products with the matching category_id
-      const products = Product.findAll({where: {category_id: category.id}});
+      const products = await Product.findAll({ where: { category_id: category.id } });
       // get array of product ids
       const productIds = products.map((product) => product.id);
       return {
         category_name: category.category_name,
         productIds: productIds
       };
-    })
-     // send back all categories with product ids
+    }));
+    // send back all categories with product ids
     res.status(200).json(categoriesWithProducts);
-  }).catch((err) => {
+  } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 });
 
-router.get('/:id', (req, res) => {
-  // find one category by its `id` value and include its associated Products
-  Category.findByPk(req.params.id).then((category) => {
+router.get('/:id', async (req, res) => {
+  try {
+    // find one category by its `id` value and include its associated Products
+    const category = await Category.findByPk(req.params.id);
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
     // get all products with the matching category_id
-    const products = Product.findAll({where: {category_id: category.id}});
+    const products = await Product.findAll({ where: { category_id: category.id } });
     // get array of product ids
     const productIds = products.map((product) => product.id);
     // create a new object with the category information and product ids
     const categoryWithProducts = {
       category_name: category.category_name,
       productIds: productIds
-    }
+    };
     // send back the category with product ids
     res.status(200).json(categoryWithProducts);
-  }).catch((err) => {
+  } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 });
 
 router.post('/', (req, res) => {

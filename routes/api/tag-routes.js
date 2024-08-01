@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
-router.get('/', (req, res) => {
-  Tag.findAll().then((tags) => {
-    const tagsWithProducts = tags.map((tag) => {
+router.get('/', async (req, res) => {
+  try {
+    const tags = await Tag.findAll();
+    const tagsWithProducts = await Promise.all(tags.map(async (tag) => {
       // get all products with the matching tag id
-      const productTags = ProductTag.findAll({where: {tag_id: tag.id}});
+      const productTags = await ProductTag.findAll({where: {tag_id: tag.id}});
       // get array of product ids
       const productIds = productTags.map((product) => product.product_id);
       return {
@@ -13,19 +14,21 @@ router.get('/', (req, res) => {
         tag_name: tag.tag_name,
         productIds: productIds
       }
-    })
+    }))
     // send back all tags with product ids
-    res.status(200).json(tagsWithProducts)
-  }).catch((err) => {
+    res.status(200).json(tagsWithProducts);
+  } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 });
 
-router.get('/:id', (req, res) => {
-  Tag.findByPk(req.params.id).then((tag) => {
+router.get('/:id', async (req, res) => {
+  try {
+    // find one tag by its `id` value
+    const tag = await Tag.findByPk(req.params.id);
     // get all products with the matching tag id
-    const productTags = ProductTag.findAll({where: {tag_id: tag.id}});
+    const productTags = await ProductTag.findAll({where: {tag_id: tag.id}});
     // get array of product ids
     const productIds = productTags.map((product) => product.product_id);
     // create a new object with the tag information and product ids
@@ -36,10 +39,10 @@ router.get('/:id', (req, res) => {
     }
     // send back the tag with product ids
     res.status(200).json(tagWithProducts);
-  }).catch((err) => {
+  } catch {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 });
 
 router.post('/', (req, res) => {

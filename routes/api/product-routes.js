@@ -1,38 +1,32 @@
 const router = require('express').Router();
 const { Product, Tag, ProductTag } = require('../../models');
 
-router.get('/', (req, res) => {
-  Product.findAll().then((products) => {
-    // get all products with information and tags
-    const productsWithTags = products.map((product) => {
-      // get tags with matching product id
-      const productTags = ProductTag.findAll({where: {id: product.id}})
-      // get array of tag ids for each product
+router.get('/', async (req, res) => {
+  try {
+    const products = await Product.findAll();
+    const productsWithTags = await Promise.all(products.map(async (product) => {
+      const productTags = await ProductTag.findAll({where: {id: product.id}});
       const tagIds = productTags.map((productTag) => productTag.tag_id);
-      // return product information with tag ids
       return {
         product_name: product.product_name,
         price: product.price,
         stock: product.stock,
         tagIds: tagIds
       }
-    })
+    }))
     res.status(200).json(productsWithTags);
-  }).catch((err) => {
+  } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 })
 
 // get one product
-router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  Product.findByPk(req.params.id).then((product) => {
-    // get tags with matching product id
-    const productTags = ProductTag.findAll({where: {id: product.id}});
-    // get array of tag ids for each product
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    const productTags = await ProductTag.findAll({where: {id: product.id}});
     const tagIds = productTags.map((productTag) => productTag.tag_id);
-    // return product information with tag ids
     const productWithTags = {
       product_name: product.product_name,
       price: product.price,
@@ -40,10 +34,10 @@ router.get('/:id', (req, res) => {
       tagIds: tagIds
     }
     res.status(200).json(productWithTags);
-  }).catch((err) => {
+  } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  }
 });
 
 // create new product
