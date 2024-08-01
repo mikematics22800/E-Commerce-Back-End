@@ -1,26 +1,45 @@
 const router = require('express').Router();
 const { Product, Tag, ProductTag } = require('../../models');
 
-// The `/` endpoint
-
-// get all products
 router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Product and Tag data
   Product.findAll().then((products) => {
-    res.status(200).json(products)
+    // get all products with information and tags
+    const productsWithTags = products.map((product) => {
+      // get tags with matching product id
+      const productTags = ProductTag.findAll({where: {id: product.id}})
+      // get array of tag ids for each product
+      const tagIds = productTags.map((productTag) => productTag.tag_id);
+      // return product information with tag ids
+      return {
+        product_name: product.product_name,
+        price: product.price,
+        stock: product.stock,
+        tagIds: tagIds
+      }
+    })
+    res.status(200).json(productsWithTags);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
   });
-});
+})
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
-  // be sure to include its associated Product and Tag data
   Product.findByPk(req.params.id).then((product) => {
-    res.status(200).json(product)
+    // get tags with matching product id
+    const productTags = ProductTag.findAll({where: {id: product.id}});
+    // get array of tag ids for each product
+    const tagIds = productTags.map((productTag) => productTag.tag_id);
+    // return product information with tag ids
+    const productWithTags = {
+      product_name: product.product_name,
+      price: product.price,
+      stock: product.stock,
+      tagIds: tagIds
+    }
+    res.status(200).json(productWithTags);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -105,8 +124,8 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  Product.destroy({where: {id: req.params.id}}).then((rows_affected) => {
-    res.status(200).json(rows_affected);
+  Product.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
+    res.status(200).json(rowsDeleted);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });

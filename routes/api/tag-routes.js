@@ -1,13 +1,21 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
-// The `/` endpoint
-
 router.get('/', (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
-  Tag.findAll().then((categories) => {
-    res.status(200).json(categories)
+  Tag.findAll().then((tags) => {
+    const tagsWithProducts = tags.map((tag) => {
+      // get all products with the matching tag id
+      const productTags = ProductTag.findAll({where: {tag_id: tag.id}});
+      // get array of product ids
+      const productIds = productTags.map((product) => product.product_id);
+      return {
+        id: tag.id,
+        tag_name: tag.tag_name,
+        productIds: productIds
+      }
+    })
+    // send back all tags with product ids
+    res.status(200).json(tagsWithProducts)
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -15,10 +23,19 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
   Tag.findByPk(req.params.id).then((tag) => {
-    res.status(200).json(tag)
+    // get all products with the matching tag id
+    const productTags = ProductTag.findAll({where: {tag_id: tag.id}});
+    // get array of product ids
+    const productIds = productTags.map((product) => product.product_id);
+    // create a new object with the tag information and product ids
+    const tagWithProducts = {
+      id: tag.id,
+      tag_name: tag.tag_name,
+      productIds: productIds
+    }
+    // send back the tag with product ids
+    res.status(200).json(tagWithProducts);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -37,8 +54,8 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   // update a tag's name by its `id` value
-  Tag.update({tag_name: req.body.tag_name}, {where: {id: req.params.id}}).then((rows_affected) => {
-    res.status(200).json(rows_affected[0]);
+  Tag.update({tag_name: req.body.tag_name}, {where: {id: req.params.id}}).then((rowsUpdated) => {
+    res.status(200).json(rowsUpdated[0]);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -47,8 +64,8 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete on tag by its `id` value
-  Tag.destroy({where: {id: req.params.id}}).then((rows_affected) => {
-    res.status(200).json(rows_affected)
+  Tag.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
+    res.status(200).json(rowsDeleted)
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });

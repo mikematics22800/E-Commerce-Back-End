@@ -1,27 +1,40 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 
-// The `/` endpoint
-
 router.get('/', (req, res) => {
-  // find all categories
-  // be sure to include its associated Products
-  let categories
-  Category.findAll().then((response) => {
-    categories = res.json(response); 
+  Category.findAll().then((categories) => {
+    const categoriesWithProducts = categories.map((category) => { 
+      // get all products with the matching category_id
+      const products = Product.findAll({where: {category_id: category.id}});
+      // get array of product ids
+      const productIds = products.map((product) => product.id);
+      return {
+        category_name: category.category_name,
+        productIds: productIds
+      };
+    })
+     // send back all categories with product ids
+    res.status(200).json(categoriesWithProducts);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
   });
-
-  categories.forEach((category) => {{}})
 });
 
 router.get('/:id', (req, res) => {
-  // find one category by its `id` value
-  // be sure to include its associated Products
-  Category.findByPk(req.params.id).then((response) => {
-    res.status(200).json(response); // send back the specified category
+  // find one category by its `id` value and include its associated Products
+  Category.findByPk(req.params.id).then((category) => {
+    // get all products with the matching category_id
+    const products = Product.findAll({where: {category_id: category.id}});
+    // get array of product ids
+    const productIds = products.map((product) => product.id);
+    // create a new object with the category information and product ids
+    const categoryWithProducts = {
+      category_name: category.category_name,
+      productIds: productIds
+    }
+    // send back the category with product ids
+    res.status(200).json(categoryWithProducts);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -30,8 +43,9 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
   // create a new category
-  Category.create({category_name: req.body.category_name}).then((response) => {
-    res.status(200).json(response); // send back the new category
+  Category.create({category_name: req.body.category_name}).then((category) => {
+    // send back the new category
+    res.status(200).json(category); 
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -40,8 +54,9 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
-  Category.update({category_name: req.body.category_name}, {where: {id: req.params.id}}).then((response) => {
-    res.status(200).json(response[0]) // send back the number of rows updated
+  Category.update({category_name: req.body.category_name}, {where: {id: req.params.id}}).then((rowsUpdated) => {
+    // send back the number of rows updated
+    res.status(200).json(rowsUpdated[0])
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -50,8 +65,9 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
-  Category.destroy({where: {id: req.params.id}}).then((response) => {
-    res.status(200).json(response); // send back the number of rows deleted
+  Category.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
+    // send back the number of rows deleted
+    res.status(200).json(rowsDeleted);
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
