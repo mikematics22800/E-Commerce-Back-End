@@ -109,7 +109,7 @@ router.put('/:id', (req, res) => {
         });
       }
 
-      return res.json(product);
+      return res.json(product[0]);
     })
     .catch((err) => {
       // console.log(err);
@@ -117,9 +117,15 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// delete product tag then product by their `id` value
 router.delete('/:id', (req, res) => {
-  Product.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
-    res.status(200).json(rowsDeleted);
+  ProductTag.destroy({where: {product_id: req.params.id}}).then(() => {
+    Product.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
+      res.status(200).json(rowsDeleted);
+    }).catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: err.message });
+    });
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
