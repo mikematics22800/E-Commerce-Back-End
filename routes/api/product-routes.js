@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         price: product.price,
         stock: product.stock,
         category: category,
-        tag: tags
+        tags: tags
       }
     }))
     res.status(200).json(products);

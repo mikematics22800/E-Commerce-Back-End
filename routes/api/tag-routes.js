@@ -3,19 +3,19 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 router.get('/', async (req, res) => {
   try {
-    const tags = await Promise.all(Tag.findAll().map(async (tag) => {
+    const tags = await Promise.all((await Tag.findAll()).map(async (tag) => {
       // get all products with the matching tag id
-      const products = await Product.findAll({where: {tag_id: tag.id}}).map((product) => {
-        const product_tag = ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
+      const products = await Promise.all((await Product.findAll({where: {tag_id: tag.id}})).map(async (product) => {
+        const product_tag = await ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
         product.product_tag = product_tag;
         return product;
-      });
+      }));
       return {
         id: tag.id,
         tag_name: tag.tag_name,
         products: products
       }
-    }))
+    }));
     // send back all tags with associated products
     res.status(200).json(tags);
   } catch(err) {
@@ -29,8 +29,8 @@ router.get('/:id', async (req, res) => {
     // find one tag by its `id` value
     const tag = await Tag.findByPk(req.params.id);
     // get all products with the matching tag id
-    const products = await Product.findAll({where: {tag_id: tag.id}}).map((product) => {
-      const product_tag = ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
+    const products = await Product.findAll({where: {tag_id: tag.id}}).map(async (product) => {
+      const product_tag = await ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
       product.product_tag = product_tag;
       return product;
     });
