@@ -8,6 +8,7 @@ router.get('/', async (req, res) => {
       const category = await Category.findByPk(product.category_id);
       const tags = productTags.map((tag) => tag.tag_id);
       return {
+        id: product.id,
         product_name: product.product_name,
         price: product.price,
         stock: product.stock,
@@ -30,6 +31,7 @@ router.get('/:id', async (req, res) => {
     const category = await Category.findByPk(product.category_id);
     const tags = productTags.map((tag) => tag.tag_id);
     const productData = {
+      id: product.id,
       product_name: product.product_name,
       price: product.price,
       stock: product.stock,

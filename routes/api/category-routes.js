@@ -8,6 +8,7 @@ router.get('/', async (req, res) => {
       // get all products with the matching category_id
       const products = await Product.findAll({ where: { category_id: category.id } });
       return {
+        id: category.id,
         category_name: category.category_name,
         products: products
       };
@@ -28,6 +29,7 @@ router.get('/:id', async (req, res) => {
     const products = await Product.findAll({ where: { category_id: category.id } });
     // create a new object with the category information and product ids
     const categoryWithProducts = {
+      id: category.id,
       category_name: category.category_name,
       products: products
     };
