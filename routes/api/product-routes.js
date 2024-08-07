@@ -1,20 +1,21 @@
 const router = require('express').Router();
-const { Product, Tag, ProductTag } = require('../../models');
+const { Product, Tag, ProductTag, Category } = require('../../models');
 
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.findAll();
-    const productsWithTags = await Promise.all(products.map(async (product) => {
+    const products = await Promise.all(await Product.findAll().map(async (product) => {
       const productTags = await ProductTag.findAll({where: {id: product.id}});
-      const tagIds = productTags.map((productTag) => productTag.tag_id);
+      const category = await Category.findByPk(product.category_id);
+      const tags = productTags.map((tag) => tag.tag_id);
       return {
         product_name: product.product_name,
         price: product.price,
         stock: product.stock,
-        tagIds: tagIds
+        category: category,
+        tag: tags
       }
     }))
-    res.status(200).json(productsWithTags);
+    res.status(200).json(products);
   } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -26,14 +27,16 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     const productTags = await ProductTag.findAll({where: {id: product.id}});
-    const tagIds = productTags.map((productTag) => productTag.tag_id);
-    const productWithTags = {
+    const category = await Category.findByPk(product.category_id);
+    const tags = productTags.map((tag) => tag.tag_id);
+    const productData = {
       product_name: product.product_name,
       price: product.price,
       stock: product.stock,
-      tagIds: tagIds
+      category: category,
+      tags: tags
     }
-    res.status(200).json(productWithTags);
+    res.status(200).json(productData);
   } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });

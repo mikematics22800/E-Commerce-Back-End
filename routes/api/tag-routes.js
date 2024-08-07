@@ -3,20 +3,21 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 router.get('/', async (req, res) => {
   try {
-    const tags = await Tag.findAll();
-    const tagsWithProducts = await Promise.all(tags.map(async (tag) => {
+    const tags = await Promise.all(Tag.findAll().map(async (tag) => {
       // get all products with the matching tag id
-      const productTags = await ProductTag.findAll({where: {tag_id: tag.id}});
-      // get array of product ids
-      const productIds = productTags.map((product) => product.product_id);
+      const products = await Product.findAll({where: {tag_id: tag.id}}).map((product) => {
+        const product_tag = ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
+        product.product_tag = product_tag;
+        return product;
+      });
       return {
         id: tag.id,
         tag_name: tag.tag_name,
-        productIds: productIds
+        products: products
       }
     }))
-    // send back all tags with product ids
-    res.status(200).json(tagsWithProducts);
+    // send back all tags with associated products
+    res.status(200).json(tags);
   } catch(err) {
     console.log(err);
     res.status(500).json({ error: err.message });
@@ -28,17 +29,19 @@ router.get('/:id', async (req, res) => {
     // find one tag by its `id` value
     const tag = await Tag.findByPk(req.params.id);
     // get all products with the matching tag id
-    const productTags = await ProductTag.findAll({where: {tag_id: tag.id}});
-    // get array of product ids
-    const productIds = productTags.map((product) => product.product_id);
+    const products = await Product.findAll({where: {tag_id: tag.id}}).map((product) => {
+      const product_tag = ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
+      product.product_tag = product_tag;
+      return product;
+    });
     // create a new object with the tag information and product ids
-    const tagWithProducts = {
+    const tags = {
       id: tag.id,
       tag_name: tag.tag_name,
-      productIds: productIds
+      products: products
     }
-    // send back the tag with product ids
-    res.status(200).json(tagWithProducts);
+    // send back tag with associated products
+    res.status(200).json(tags);
   } catch {
     console.log(err);
     res.status(500).json({ error: err.message });

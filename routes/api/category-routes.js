@@ -7,11 +7,9 @@ router.get('/', async (req, res) => {
     const categoriesWithProducts = await Promise.all(categories.map(async (category) => {
       // get all products with the matching category_id
       const products = await Product.findAll({ where: { category_id: category.id } });
-      // get array of product ids
-      const productIds = products.map((product) => product.id);
       return {
         category_name: category.category_name,
-        productIds: productIds
+        products: products
       };
     }));
     // send back all categories with product ids
@@ -31,12 +29,10 @@ router.get('/:id', async (req, res) => {
     }
     // get all products with the matching category_id
     const products = await Product.findAll({ where: { category_id: category.id } });
-    // get array of product ids
-    const productIds = products.map((product) => product.id);
     // create a new object with the category information and product ids
     const categoryWithProducts = {
       category_name: category.category_name,
-      productIds: productIds
+      products: products
     };
     // send back the category with product ids
     res.status(200).json(categoryWithProducts);
