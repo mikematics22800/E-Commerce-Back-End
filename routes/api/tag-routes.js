@@ -5,11 +5,17 @@ router.get('/', async (req, res) => {
   try {
     const tags = await Promise.all((await Tag.findAll()).map(async (tag) => {
       // get all products with the matching tag id
-      const products = await Promise.all((await Product.findAll({where: {tag_id: tag.id}})).map(async (product) => {
-        const product_tag = await ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
-        product.product_tag = product_tag;
-        return product;
-      }));
+      const products = await Promise.all((await ProductTag.findAll({where: {tag_id: tag.id}})).map(async (productTag) => {
+        const product = await Product.findAll({where: {product_id: productTag.product_id}});
+        return {
+          id: product.id,
+          product_name: product.product_name,
+          price: product.price,
+          stock: product.stock,
+          category_id: product.category_id,
+          product_tag: productTag
+        }
+      }))
       return {
         id: tag.id,
         tag_name: tag.tag_name,
@@ -29,11 +35,17 @@ router.get('/:id', async (req, res) => {
     // find one tag by its `id` value
     const tag = await Tag.findByPk(req.params.id);
     // get all products with the matching tag id
-    const products = await Product.findAll({where: {tag_id: tag.id}}).map(async (product) => {
-      const product_tag = await ProductTag.findAll({where: {product_id: product.product_id, tag_id: tag.id}});
-      product.product_tag = product_tag;
-      return product;
-    });
+    const products = await Promise.all((await ProductTag.findAll({where: {tag_id: tag.id}})).map(async (productTag) => {
+      const product = await Product.findAll({where: {product_id: productTag.product_id}});
+      return {
+        id: product.id,
+        product_name: product.product_name,
+        price: product.price,
+        stock: product.stock,
+        category_id: product.category_id,
+        product_tag: productTag
+      }
+    }))
     // create a new object with the tag information and product ids
     const tags = {
       id: tag.id,
