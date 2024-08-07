@@ -6,7 +6,7 @@ router.get('/', async (req, res) => {
     const tags = await Promise.all((await Tag.findAll()).map(async (tag) => {
       // get all products with the matching tag id
       const products = await Promise.all((await ProductTag.findAll({where: {tag_id: tag.id}})).map(async (productTag) => {
-        const product = await Product.findAll({where: {product_id: productTag.product_id}});
+        const product = await Product.findAll({where: {id: productTag.product_id}});
         return {
           id: product.id,
           product_name: product.product_name,
@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
     const tag = await Tag.findByPk(req.params.id);
     // get all products with the matching tag id
     const products = await Promise.all((await ProductTag.findAll({where: {tag_id: tag.id}})).map(async (productTag) => {
-      const product = await Product.findAll({where: {product_id: productTag.product_id}});
+      const product = await Product.findAll({where: {id: productTag.product_id}});
       return {
         id: product.id,
         product_name: product.product_name,
