@@ -69,14 +69,19 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  // delete a category by its `id` value
-  Category.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
-    // send back the number of rows deleted
-    res.status(200).json(rowsDeleted);
+  // delete a category and associated products by its `id` value
+  Product.destroy({where: {category_id: req.params.id}}).then(() => {
+    Category.destroy({where: {id: req.params.id}}).then((rowsDeleted) => {
+      // send back the number of rows deleted
+      res.status(200).json(rowsDeleted);
+    }).catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: err.message });
+    });
   }).catch((err) => {
     console.log(err);
     res.status(500).json({ error: err.message });
-  });
+  })
 });
 
 module.exports = router;
